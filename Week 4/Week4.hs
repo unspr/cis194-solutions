@@ -36,4 +36,4 @@ res = foldTree "ABCDEFGHIJ"
 
 isBalance :: Tree a -> Bool
 isBalance Leaf = True
-isBalance (Node _ left _ right) = isBalance left && isBalance right
+isBalance (Node _ left _ right) = isBalance left && isBalance right && abs (height left - height right) <= 1
