@@ -32,8 +32,23 @@ height :: Tree a -> Integer
 height Leaf = 0
 height (Node h left _ right) = h
 
-res = foldTree "ABCDEFGHIJ"
+-- res = foldTree "ABCDEFGHIJ"
 
 isBalance :: Tree a -> Bool
 isBalance Leaf = True
 isBalance (Node _ left _ right) = isBalance left && isBalance right && abs (height left - height right) <= 1
+
+
+xor :: [Bool] -> Bool
+xor = foldr (\x y-> if x == True then (not y) else y) False
+
+-- res = xor [False, True, False, False, True] 
+
+map' :: (a -> b) -> [a] -> [b]
+map' f = foldr (\x list -> [f x] ++ list) []
+
+-- res = map' (+ 1) [1..9]
+
+myFoldl :: (a -> b -> a) -> a -> [b] -> a
+myFoldl f base xs = foldr f base (reverse xs)
+
