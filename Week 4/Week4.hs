@@ -50,5 +50,24 @@ map' f = foldr (\x list -> [f x] ++ list) []
 -- res = map' (+ 1) [1..9]
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
-myFoldl f base xs = foldr f base (reverse xs)
+myFoldl f base xs = foldr (flip f) base (reverse xs)
 
+-- cartProd :: [a] -> [b] -> [(a, b)]
+-- cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+
+-- 事实上该函数返回的是所有素数，不同于题目所描述的所有奇数素数，但由于仅有2为偶数，
+-- 因此只需 tail (sieveSundaram n) 即可得到所需答案
+sieveSundaram :: Integer -> [Integer]
+-- sieveSundaram n = map head 
+--                         (takeWhile ((> 0).length)
+--                             (iterate (\list -> let first = head list in
+--                                 filter (\x -> if (mod x first) == 0 then False else True)
+--                                     (tail list)) 
+--                                 [2..2*n+2]))
+sieveSundaram = map head .
+                        (\n -> (takeWhile ((> 0).length)
+                                    (iterate (\list -> let first = head list in
+                                        filter (\x -> if (mod x first) == 0 then False else True)
+                                            (tail list)) 
+                                        [2..2*n+2])))
+res = sieveSundaram 50
