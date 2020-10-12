@@ -14,4 +14,18 @@ evalStr str = case parseExp Lit Add Mul str of
                     Nothing -> Nothing
                     Just exp -> Just (eval exp)
 
-res = evalStr "2+3 * 4"
+-- res = evalStr "2+3 * 4"
+
+class Expr a where
+    lit :: Integer -> a
+    add :: a -> a -> a
+    mul :: a -> a -> a
+
+instance Expr ExprT where
+    lit a = Lit a
+    add a1 a2 = Add a1 a2
+    mul a1 a2 = Mul a1 a2
+
+reify :: ExprT -> ExprT
+reify = id
+
