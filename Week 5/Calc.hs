@@ -1,19 +1,20 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE TypeSynonymInstances,  FlexibleInstances #-}
 
 module Calc where
 import ExprT
 import Parser
 import StackVM
+import qualified Data.Map as M
 
 eval :: ExprT -> Integer
-eval (Lit n) = n
+eval (ExprT.Lit n) = n
 eval (ExprT.Add a b) = eval a + eval b
 eval (ExprT.Mul a b) = eval a * eval b
 
 -- res = eval (Mul (Add (Lit 2) (Lit 3)) (Lit 4))
 
 evalStr :: String -> Maybe Integer
-evalStr str = case parseExp Lit ExprT.Add ExprT.Mul str of
+evalStr str = case parseExp ExprT.Lit ExprT.Add ExprT.Mul str of
                     Nothing -> Nothing
                     Just exp -> Just (eval exp)
 
@@ -63,6 +64,18 @@ testInteger = testExp :: Maybe Integer
 testBool = testExp :: Maybe Bool
 testMM = testExp :: Maybe MinMax
 testSat = testExp :: Maybe Mod7
+
+
+instance Expr Program where
+    lit a = [PushI a]
+    add a1 a2 = a1 ++ a2 ++ [StackVM.Add]
+    mul a1 a2 = a1 ++ a2 ++ [StackVM.Mul]
+
+
+compile :: String -> Maybe Program
+compile s = parseExp lit add mul s :: Maybe Program
+
+-- res = compile "(3*-4) + 5"
 
 
 
