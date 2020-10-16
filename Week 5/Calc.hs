@@ -4,7 +4,7 @@ module Calc where
 import ExprT
 import Parser
 import StackVM
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 
 eval :: ExprT -> Integer
 eval (ExprT.Lit n) = n
@@ -77,5 +77,38 @@ compile s = parseExp lit add mul s :: Maybe Program
 
 -- res = compile "(3*-4) + 5"
 
+class HasVars a where
+    var :: String -> a
+
+data VarExprT = Variable String
+           | Lit Integer
+           | Add VarExprT VarExprT
+           | Mul VarExprT VarExprT
+  deriving (Show, Eq)
+
+instance Expr VarExprT where
+    lit = Calc.Lit
+    add = Calc.Add
+    mul = Calc.Mul
+
+instance HasVars VarExprT where
+    var = Variable
+
+instance HasVars (M.Map String Integer -> Maybe Integer) where
+    var s = (\str -> (\input -> case input of
+                        (M.Map str num) -> Maybe num
+                        _ -> Nothing)) s
+
+instance Expr (M.Map String Integer -> Maybe Integer) where
+    lit num = (\str -> (\input -> case input of
+                        (M.Map str num) -> Maybe num
+                        _ -> Nothing)) num
+    add a b = (\s -> M.Map s a + b -> Maybe a + b) 
+    mul a b = (\s -> (M.Map s (a* b) -> Maybe (a * b)))  
+
+-- withVars :: [(String, Integer)]
+-- -> (M.Map String Integer -> Maybe Integer)
+-- -> Maybe Integer
+-- withVars vs exp = exp $ M.fromList vs
 
 
