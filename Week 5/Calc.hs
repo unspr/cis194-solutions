@@ -4,7 +4,8 @@ module Calc where
 import ExprT
 import Parser
 import StackVM
-import qualified Data.Map.Strict as M
+import qualified Data.Map as M
+import Data.Maybe
 
 eval :: ExprT -> Integer
 eval (ExprT.Lit n) = n
@@ -95,20 +96,24 @@ instance HasVars VarExprT where
     var = Variable
 
 instance HasVars (M.Map String Integer -> Maybe Integer) where
-    var s = (\str -> (\input -> case input of
-                        (M.Map str num) -> Maybe num
-                        _ -> Nothing)) s
+    var = M.lookup
 
 instance Expr (M.Map String Integer -> Maybe Integer) where
-    lit num = (\str -> (\input -> case input of
-                        (M.Map str num) -> Maybe num
-                        _ -> Nothing)) num
-    add a b = (\s -> M.Map s a + b -> Maybe a + b) 
-    mul a b = (\s -> (M.Map s (a* b) -> Maybe (a * b)))  
+    lit num = (\_ -> Just num)
+    add a b = (\map -> let x = a map; y = b map in
+                            if isJust x && isJust y then
+                                Just (fromJust x + fromJust y)
+                            else 
+                                Nothing)
+    mul a b = (\map -> let x = a map; y = b map in
+                            if isJust x && isJust y then
+                                Just (fromJust x * fromJust y)
+                            else 
+                                Nothing)
 
--- withVars :: [(String, Integer)]
--- -> (M.Map String Integer -> Maybe Integer)
--- -> Maybe Integer
--- withVars vs exp = exp $ M.fromList vs
+withVars :: [(String, Integer)]
+    -> (M.Map String Integer -> Maybe Integer)
+    -> Maybe Integer
+withVars vs exp = exp $ M.fromList vs
 
-
+res = withVars [("x", 6), ("y", 3)] $ mul (var "x") (add (var "y") (var "x"))
