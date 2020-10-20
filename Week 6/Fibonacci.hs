@@ -22,9 +22,13 @@ streamToList :: Stream a -> [a]
 streamToList (Stream x s) = x : streamToList s
 
 instance Show a => Show (Stream a) where
-    show = unwords . map show . (take 20 .streamToList)
+    show = unwords . map show . take 20 .streamToList
 
 tmp :: Stream Integer
 tmp = Stream 1 tmp
 
 res = show $ tmp
+
+streamRepeat :: a -> Stream a
+streamRepeat = 
+
