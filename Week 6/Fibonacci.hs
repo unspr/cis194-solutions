@@ -24,11 +24,18 @@ streamToList (Stream x s) = x : streamToList s
 instance Show a => Show (Stream a) where
     show = unwords . map show . take 20 .streamToList
 
-tmp :: Stream Integer
-tmp = Stream 1 tmp
-
-res = show $ tmp
+-- res = streamMap (+ 1).streamRepeat $ 1
 
 streamRepeat :: a -> Stream a
-streamRepeat = 
+streamRepeat x = Stream x (streamRepeat x)
 
+streamMap :: (a -> b) -> Stream a -> Stream b
+streamMap f (Stream x s) =  Stream (f x) (streamMap f s)
+
+streamFromSeed :: (a -> a) -> a -> Stream a
+streamFromSeed f x = Stream x (streamFromSeed f (f x))
+
+nats :: Stream Integer
+nats = streamFromSeed (+ 1) 0
+
+ruler :: Stream Integer
