@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
+
 fib :: Integer -> Integer
 fib n = if n < 2 then n else fib (n-1) + fib (n-2)
 
@@ -24,8 +27,6 @@ streamToList (Stream x s) = x : streamToList s
 instance Show a => Show (Stream a) where
     show = unwords . map show . take 20 .streamToList
 
--- res = streamMap (+ 1).streamRepeat $ 1
-
 streamRepeat :: a -> Stream a
 streamRepeat x = Stream x (streamRepeat x)
 
@@ -39,3 +40,25 @@ nats :: Stream Integer
 nats = streamFromSeed (+ 1) 0
 
 ruler :: Stream Integer
+ruler = interleaveStreams (streamRepeat 0) (streamMap (+ 1) ruler)
+
+-- 写到这个函数的时候有点开心的
+interleaveStreams :: Stream Integer -> Stream Integer -> Stream Integer
+-- interleaveStreams (Stream x nx) (Stream y ny) = Stream x (Stream y (interleaveStreams nx ny))
+interleaveStreams (Stream x next) s = Stream x (interleaveStreams s next)
+
+-- res = ruler
+
+x :: Stream Integer
+x = (Stream 0 (Stream 1 (streamRepeat 0)))
+
+instance Num (Stream Integer) where
+    fromInteger n = Stream n (streamRepeat 0)
+    negate = streamMap (* (-1))
+    (Stream a an) + (Stream b bn) = (Stream (a+b) (an + bn)) 
+    -- (Stream a0 a') * b@(Stream b0 b') = (Stream (a0*b0) (fromInteger a0*b' + a'*b))
+    (Stream a0 a') * b = (fromInteger a0 * b) + tmp a' b
+
+
+tmp :: Stream Integer -> Stream Integer -> Stream Integer
+tmp (Stream a0 a') b = x*(a'*b + tmp a' b)
