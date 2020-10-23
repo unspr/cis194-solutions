@@ -13,10 +13,10 @@ fibTail (x:y:_) = x+y : fibTail [y, x+y]
 fibs2 :: [Integer]
 fibs2 = [0, 1] ++ fibTail [0, 1]
 
--- fibs3 这种方式确实很有趣，或许体现了 Haskell 惰性求值的优势，这种实现会更函数式些
+-- fibs 这种方式确实很有趣，或许体现了 Haskell 惰性求值的优势，这种实现会更函数式些
 -- 但最初的fib无法重复利用已计算的值而这里可以应该与具体 Haskell 的实现有关
-fibs3 :: [Integer]
-fibs3 = 0:1:zipWith (+) fibs3 (tail fibs3)
+fibs :: [Integer]
+fibs = 0:1:zipWith (+) fibs (tail fibs)
 
 
 data Stream a = Stream a (Stream a)
@@ -55,10 +55,10 @@ x = (Stream 0 (Stream 1 (streamRepeat 0)))
 instance Num (Stream Integer) where
     fromInteger n = Stream n (streamRepeat 0)
     negate = streamMap (* (-1))
-    (Stream a an) + (Stream b bn) = (Stream (a+b) (an + bn)) 
-    -- (Stream a0 a') * b@(Stream b0 b') = (Stream (a0*b0) (fromInteger a0*b' + a'*b))
-    (Stream a0 a') * b = (fromInteger a0 * b) + tmp a' b
+    (Stream a an) + (Stream b bn) = Stream (a+b) (an + bn)
+    (Stream a0 a') * b@(Stream b0 b') = Stream (a0*b0) (fromInteger a0*b' + a'*b)
 
+instance Fractional (Stream Integer) where
+    a@(Stream a0 a') / b@(Stream b0 b') =  Stream (a0 `div` b0) (fromInteger (1 `div` b0))*(a' - a/b *b')
 
-tmp :: Stream Integer -> Stream Integer -> Stream Integer
-tmp (Stream a0 a') b = x*(a'*b + tmp a' b)
+fibs3 :: Stream Integer
