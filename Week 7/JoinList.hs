@@ -37,6 +37,11 @@ dropJ n x@(Append m l r)
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 takeJ n Empty = Empty
+takeJ n jl
+    | n == 0 = Empty
+    | n >= getSize (size (tag jl)) = jl
+takeJ n (Append m l r)
     | n < getSize (size (tag l)) = takeJ n l
     | n == getSize (size (tag l)) = l
-    -- | True = takeJ (n - (getSize (size (tag l)))) r
+    | True = l +++ takeJ (n - (getSize (size (tag l)))) r
+
