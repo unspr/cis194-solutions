@@ -59,7 +59,7 @@ scoreLine str =  Single (scoreString str) str
 instance Buffer (JoinList (Score, Size) String) where
     toString jl = case tag jl of
                     (_, n) -> unwords $ map (fromJust .(flip indexJ $jl)) [0..(getSize (size n)-1)]
-    fromString str = foldr (+++) Empty (map (\str -> Single (scoreString str, Size 1) str) (lines str))
+    fromString str = foldr (+++) Empty (map (\s -> Single (scoreString s, Size 1) s) (lines str))
     line n jl = indexJ n jl
     replaceLine n str jl = takeJ n jl +++ Single (scoreString str, Size 1) str +++ dropJ (n+1) jl
     numLines jl = getSize (size (tag jl))
