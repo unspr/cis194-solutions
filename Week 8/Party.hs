@@ -20,6 +20,10 @@ treeFold f val t = foldr (\tree tmp -> treeFold f mempty tree <> tmp)
                          (f (rootLabel t) val)
                          (subForest t)
 
-nextLevel :: Employee -> [(GuestList, GuestList)]
--> (GuestList, GuestList)
+nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
+nextLevel e list = (foldr (<>) mempty (map (\(noBobList, hasBobList) ->
+                                            moreFun noBobList hasBobList)
+                                        list),
+                    glCons e $ foldr (<>) mempty (map (\(noBobList, hasBobList) -> noBobList) list))
 
+-- maxFun :: Tree Employee -> GuestList
