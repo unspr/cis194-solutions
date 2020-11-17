@@ -15,10 +15,13 @@ moreFun xgl ygl = case compare xgl ygl of
                     GT -> xgl
                     _ -> ygl
 
-treeFold :: Monoid b => (a -> b -> b) -> b -> Tree a -> b
-treeFold f val t = foldr (\tree tmp -> treeFold f mempty tree <> tmp) 
-                         (f (rootLabel t) val)
-                         (subForest t)
+-- treeFold :: Monoid b => (a -> b -> b) -> b -> Tree a -> b
+-- treeFold f val t = foldr (\tree tmp -> treeFold f mempty tree <> tmp) 
+--                          (f (rootLabel t) val)
+--                          (subForest t)
+
+treeFold :: Monoid b => (a -> [b] -> b) -> Tree a -> b
+treeFold f t = f (rootLabel t) (map (treeFold f) (subForest t))
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
 nextLevel e list = (foldr (<>) mempty (map (\(noBobList, hasBobList) ->
@@ -26,4 +29,8 @@ nextLevel e list = (foldr (<>) mempty (map (\(noBobList, hasBobList) ->
                                         list),
                     glCons e $ foldr (<>) mempty (map (\(noBobList, hasBobList) -> noBobList) list))
 
--- maxFun :: Tree Employee -> GuestList
+maxFun :: Tree Employee -> GuestList
+maxFun t = case treeFold nextLevel t of
+            (x, y) -> moreFun x y
+
+res = maxFun testCompany2
