@@ -2,6 +2,7 @@ module Party where
 import Employee
 import Data.Tree
 import Data.Monoid
+import Data.List
 
 glCons :: Employee -> GuestList -> GuestList
 glCons e (GL list fun) = GL (e:list) (fun + empFun e)
@@ -33,4 +34,8 @@ maxFun :: Tree Employee -> GuestList
 maxFun t = case treeFold nextLevel t of
             (x, y) -> moreFun x y
 
-res = maxFun testCompany2
+helpFun :: String -> String
+helpFun str = case maxFun $ read str of
+                (GL list n) -> "Total fun: " ++ show n ++ "\n" ++ (unlines $ sortBy (\x y -> compare x y) (map empName list))
+-- res = maxFun testCompany2
+main = readFile "company.txt" >>= putStrLn . helpFun
