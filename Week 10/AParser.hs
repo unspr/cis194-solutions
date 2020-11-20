@@ -56,4 +56,10 @@ posInt = Parser f
 
 ------------------------------------------------------------
 -- Your code goes below here
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (x, y) = (f x, y)
+
+instance Functor Parser where
+  fmap f (Parser (\x -> Maybe (y, String))) = Parser $ (\x -> )
+
 ------------------------------------------------------------
