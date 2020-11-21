@@ -60,6 +60,10 @@ first :: (a -> b) -> (a,c) -> (b,c)
 first f (x, y) = (f x, y)
 
 instance Functor Parser where
-  fmap f (Parser (\x -> Maybe (y, String))) = Parser $ (\x -> )
+  fmap f (Parser x) = Parser $ ff.x where
+    ff Nothing = Nothing
+    ff (Just n) = Just $ first f n 
+
+instance Applicative Parser where
 
 ------------------------------------------------------------
