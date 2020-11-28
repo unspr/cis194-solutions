@@ -68,7 +68,28 @@ instance Applicative Parser where
     y str = case f str of
               Nothing -> Nothing
               Just (ff, s) -> fmap (first ff) (x s)
-  
-abParser = f <$> pure 'a' <*> pure 'b' where
+ 
+abParser :: Parser (Char, Char) 
+abParser = f <$> char 'a' <*> char 'b' where
   f 'a' 'b' = ('a', 'b')
-------------------------------------------------------------
+
+abParser_ :: Parser ()
+abParser_ = fmap f abParser where
+  f ('a', 'b') = ()
+
+intPair :: Parser [Integer]
+intPair = f <$> posInt <*> char ' ' <*> posInt where
+  f a _ b = a : [b]
+
+instance Alternative Parser where
+  empty = Parser $ f where
+    f str = Nothing
+  (<|>) (Parser a) (Parser b) = Parser x where
+    x str = case a str of
+              Nothing -> b str
+              otherwise -> a str
+
+intOrUppercase :: Parser ()
+intOrUppercase = (<|>) (fmap f posInt) (fmap f (satisfy isUpper)) where
+  f _ = ()
+----------------------------------------------------------
