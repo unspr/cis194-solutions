@@ -48,7 +48,7 @@ battle b@(Battlefield attack defend) = do
       Battlefield <$> return (attack - ((min (length ll) (length rr)) - num)) <*> return (defend - num)
 
 
--- main = battle $ Battlefield 4 3
+-- res = runRand (battle $ Battlefield 4 3) (mkStdGen 1)
 invade :: Battlefield -> Rand StdGen Battlefield
 invade b
   | attackers b < 2 || defenders b <= 0 = return b
