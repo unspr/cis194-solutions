@@ -28,6 +28,7 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+  deriving Show
 
 both :: (a -> b) -> (a, a) -> (b, b)
 both f (x, y) = (f x, f y)
@@ -47,4 +48,19 @@ battle b@(Battlefield attack defend) = do
       Battlefield <$> return (attack - ((min (length ll) (length rr)) - num)) <*> return (defend - num)
 
 
-res = battle $ Battlefield 4 3
+-- main = battle $ Battlefield 4 3
+invade :: Battlefield -> Rand StdGen Battlefield
+invade b
+  | attackers b < 2 || defenders b <= 0 = return b
+  | True = battle b >>= invade
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb b = fmap  (sum.map (\x -> if defenders x <= 0 then 0.001 else 0))
+                      $ replicateM 1000 (invade b)
+
+-- exactSuccessProb :: Battlefield -> Double
+
+  
+  
+  
+                   
